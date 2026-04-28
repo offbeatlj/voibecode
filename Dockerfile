@@ -4,7 +4,7 @@ FROM node:22 AS builder
 WORKDIR /app
 
 # Copy all files from the current directory
-ARG CACHEBUST=1
+ARG CACHEBUST=2
 COPY . ./
 RUN echo "API_KEY=PLACEHOLDER" > ./.env
 RUN echo "GEMINI_API_KEY=PLACEHOLDER" >> ./.env
