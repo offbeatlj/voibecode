@@ -1,0 +1,45 @@
+/* Base reset / globals for VoibeCode */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom scrollbar for sidebar areas */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.5);
+  border-radius: 2px;
+}
+
+/* Utility: safe bottom padding for mobile nav */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 60px);
+}
+
+/* Animation utilities */
+.animate-in {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in { animation-name: fade-in; }
+
+@keyframes slide-in-from-bottom-4 {
+  from { transform: translateY(16px); }
+  to { transform: translateY(0); }
+}
+.slide-in-from-bottom-4 { animation-name: slide-in-from-bottom-4; }

@@ -1,0 +1,743 @@
+/* ====================================
+   VOIBECODE SHOP ADVERTISEMENT STYLES
+   ==================================== */
+
+/* ---- SHOP BANNER (Top Carousel) ---- */
+.shop-banner-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0.95), rgba(5, 5, 5, 1));
+}
+
+.shop-banner-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 24px;
+  text-decoration: none;
+  color: white;
+  position: relative;
+  transition: background 0.3s;
+  min-height: 72px;
+}
+.shop-banner-link:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.shop-banner-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: background 0.5s;
+}
+
+.shop-banner-image-wrap {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(30, 30, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.shop-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shop-banner-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.shop-banner-type {
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: color 0.5s;
+}
+
+.shop-banner-name {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shop-banner-tagline {
+  font-size: 11px;
+  color: rgba(148, 163, 184, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shop-banner-action {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.shop-banner-price {
+  font-family: 'Fira Code', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  transition: color 0.5s;
+}
+
+.shop-banner-cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.shop-banner-link:hover .shop-banner-cta {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(2px);
+}
+
+.shop-banner-arrow {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.2s;
+}
+.shop-banner-link:hover .shop-banner-arrow {
+  transform: translateX(3px);
+}
+
+/* Banner fade transitions */
+.shop-banner-fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.shop-banner-fade-out {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+/* Dots */
+.shop-banner-dots {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+}
+.shop-banner-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+.shop-banner-dot.active {
+  width: 14px;
+  border-radius: 3px;
+}
+.shop-banner-dot:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Nav arrows */
+.shop-banner-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 8px 6px;
+  z-index: 10;
+  opacity: 0;
+  transition: all 0.2s;
+}
+.shop-banner-container:hover .shop-banner-nav {
+  opacity: 1;
+}
+.shop-banner-nav:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+.shop-banner-nav-left { left: 4px; }
+.shop-banner-nav-right { right: 4px; }
+
+/* Store brand tag */
+.shop-banner-brand {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  font-family: 'Fira Code', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: rgba(148, 163, 184, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.shop-banner-brand-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  transition: background 0.5s;
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ---- SHOP SIDEBAR (Authentic Screenshots) ---- */
+.shop-sidebar-authentic {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Store Banner (top) ── */
+.shop-sidebar-store-banner {
+  display: block;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  height: 56px;
+  transition: all 0.3s ease;
+}
+.shop-sidebar-store-banner:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.08);
+}
+
+.shop-sidebar-store-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: brightness(0.45);
+  transition: filter 0.3s, transform 0.4s;
+}
+.shop-sidebar-store-banner:hover .shop-sidebar-store-banner-img {
+  filter: brightness(0.55);
+  transform: scale(1.03);
+}
+
+.shop-sidebar-store-banner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  pointer-events: none;
+}
+
+.shop-sidebar-store-banner-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+}
+
+.shop-sidebar-store-banner-cta {
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: rgba(34, 211, 238, 0.8);
+  transition: color 0.2s;
+}
+.shop-sidebar-store-banner:hover .shop-sidebar-store-banner-cta {
+  color: rgba(34, 211, 238, 1);
+}
+
+/* ── Product Cards ── */
+.shop-sidebar-products {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shop-sidebar-product-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.3);
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+.shop-sidebar-product-card:hover {
+  border-color: rgba(234, 179, 8, 0.3);
+  background: rgba(15, 23, 42, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.shop-sidebar-product-img {
+  width: 72px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  transition: transform 0.3s;
+}
+.shop-sidebar-product-card:hover .shop-sidebar-product-img {
+  transform: scale(1.04);
+}
+
+.shop-sidebar-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.shop-sidebar-product-name {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shop-sidebar-product-meta {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  color: rgba(148, 163, 184, 0.6);
+  letter-spacing: 0.5px;
+}
+
+/* ── Loomstation Banner (bottom) ── */
+.shop-sidebar-loom-banner {
+  display: block;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  height: 64px;
+  transition: all 0.3s ease;
+}
+.shop-sidebar-loom-banner:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.08);
+}
+
+.shop-sidebar-loom-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: brightness(0.5);
+  transition: filter 0.3s, transform 0.4s;
+}
+.shop-sidebar-loom-banner:hover .shop-sidebar-loom-banner-img {
+  filter: brightness(0.6);
+  transform: scale(1.03);
+}
+
+.shop-sidebar-loom-banner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+}
+
+.shop-sidebar-loom-banner-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 10px rgba(0,0,0,0.8);
+}
+
+.shop-sidebar-loom-banner-sub {
+  font-family: 'Fira Code', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: rgba(59, 130, 246, 0.8);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+.shop-sidebar-loom-banner:hover .shop-sidebar-loom-banner-sub {
+  color: rgba(59, 130, 246, 1);
+}
+
+
+/* ---- INLINE AD (Wide) ---- */
+.inline-ad-wide {
+  margin: 12px 0;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.5s ease;
+}
+.inline-ad-wide.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.inline-ad-wide-link {
+  display: block;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s;
+}
+.inline-ad-wide-link:hover {
+  border-color: var(--ad-color, rgba(255, 255, 255, 0.15));
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.inline-ad-wide-bg {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.3s;
+}
+
+.inline-ad-wide-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+}
+
+.inline-ad-wide-image-wrap {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.inline-ad-wide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+.inline-ad-wide-link:hover .inline-ad-wide-image {
+  transform: scale(1.08);
+}
+
+.inline-ad-wide-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.inline-ad-wide-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  transition: color 0.3s;
+}
+
+.inline-ad-wide-headline {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.inline-ad-wide-subtext {
+  font-size: 11px;
+  color: rgba(148, 163, 184, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inline-ad-wide-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.inline-ad-wide-price {
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.inline-ad-wide-shop-btn {
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  color: black;
+  transition: all 0.2s;
+}
+.inline-ad-wide-link:hover .inline-ad-wide-shop-btn {
+  transform: translateX(2px);
+}
+
+.inline-ad-wide-sponsored {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-family: 'Fira Code', monospace;
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: rgba(148, 163, 184, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+
+/* ---- INLINE AD (Compact) ---- */
+.inline-ad-compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  color: white;
+  margin: 8px 0;
+  transition: all 0.3s;
+  opacity: 0;
+  transform: translateX(-8px);
+}
+.inline-ad-compact.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.inline-ad-compact:hover {
+  border-color: var(--ad-color, rgba(255, 255, 255, 0.15));
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.inline-ad-compact-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.inline-ad-compact-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.inline-ad-compact-name {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.inline-ad-compact-price {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+}
+
+.inline-ad-compact-cta {
+  font-family: 'Fira Code', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(148, 163, 184, 0.6);
+  transition: color 0.2s;
+}
+.inline-ad-compact:hover .inline-ad-compact-cta {
+  color: white;
+}
+
+
+/* ---- FLOATING PROMO ---- */
+.floating-promo {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  width: 200px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: 90;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6);
+  animation: floatIn 0.5s ease;
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.floating-promo-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+  padding: 2px 6px;
+  transition: color 0.2s;
+}
+.floating-promo-close:hover {
+  color: white;
+}
+
+.floating-promo-link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: white;
+}
+
+.floating-promo-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.floating-promo-info {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.floating-promo-tag {
+  font-family: 'Fira Code', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.floating-promo-name {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.floating-promo-price {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: rgba(148, 163, 184, 0.7);
+}
+
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .shop-banner-link {
+    padding: 8px 14px;
+    min-height: 60px;
+  }
+  .shop-banner-image-wrap {
+    width: 44px;
+    height: 44px;
+  }
+  .shop-banner-name {
+    font-size: 13px;
+  }
+  .shop-banner-price {
+    font-size: 14px;
+  }
+  .shop-banner-cta {
+    display: none;
+  }
+  .shop-banner-brand {
+    display: none;
+  }
+  .shop-banner-nav {
+    display: none;
+  }
+
+  .shop-sidebar-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .floating-promo {
+    bottom: 70px;
+    right: 10px;
+    width: 170px;
+  }
+  .floating-promo-img {
+    height: 110px;
+  }
+
+  .inline-ad-wide-content {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .inline-ad-wide-image-wrap {
+    width: 48px;
+    height: 48px;
+  }
+  .inline-ad-wide-headline {
+    font-size: 13px;
+  }
+}
