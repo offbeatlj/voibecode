@@ -5,7 +5,7 @@ import { CodeEditor } from './components/CodeEditor';
 import { ControlPanel } from './components/ControlPanel';
 import { Visualizer } from './components/Visualizer';
 import { Console } from './components/Console';
-import { MerchModal } from './components/MerchModal';
+
 import { TutorialOverlay } from './components/TutorialOverlay';
 import { CheatSheet } from './components/CheatSheet';
 import { MobileNavBar } from './components/MobileNavBar';
@@ -13,9 +13,7 @@ import { RecordingModal } from './components/RecordingModal';
 import { DailyPuzzleBanner } from './components/DailyPuzzleBanner';
 import { PuzzleInterface } from './components/PuzzleInterface';
 import { ShopSidebar } from './components/ShopSidebar';
-import { FloatingShopPromo } from './components/InlineShopAd';
 
-import { AdTickerStrip } from './components/AdTickerStrip';
 import { INITIAL_TRACKS, DEFAULT_BPM, TOTAL_STEPS, SOUND_PACKS, SCALES, DEFAULT_CODE, getDailyPuzzle, getSeasonalDemo } from './constants';
 import { Track, PlayState, Scale, VisualizerSettings, DailyPuzzle, UserStats } from './types';
 import { audioEngine } from './services/AudioEngine';
@@ -26,7 +24,7 @@ const App: React.FC = () => {
   const [bpm, setBpm] = useState<number>(DEFAULT_BPM);
   const [swing, setSwing] = useState<number>(0);
   const [playState, setPlayState] = useState<PlayState>(PlayState.STOPPED);
-  const [isMerchOpen, setIsMerchOpen] = useState(false);
+
   const [filter, setFilter] = useState(0);
   const [currentScale, setCurrentScale] = useState<Scale>(SCALES[0]);
   
@@ -490,7 +488,7 @@ const App: React.FC = () => {
             onQuickClip={handleQuickClip}
             recordingProgress={recordingProgress}
             onShare={handleShare}
-            onOpenMerch={() => setIsMerchOpen(true)}
+            onOpenMerch={() => window.open('https://voibecode-shop.fourthwall.com/', '_blank')}
             visSettings={visSettings}
             onUpdateVisSettings={(s) => setVisSettings(prev => ({ ...prev, ...s }))}
             onInsertCode={handleInsertSnippet}
@@ -511,8 +509,7 @@ const App: React.FC = () => {
     <div className="fixed inset-0 h-[100dvh] bg-[#050505] text-white overflow-hidden flex flex-col font-inter">
       {showTutorial && <TutorialOverlay onComplete={handleTutorialComplete} />}
       
-      {/* Subtle ad ticker */}
-      <AdTickerStrip />
+
       
       <DailyPuzzleBanner onOpen={() => setIsPuzzleOpen(true)} />
 
@@ -606,11 +603,7 @@ const App: React.FC = () => {
           stats={userStats}
       />
 
-      <MerchModal isOpen={isMerchOpen} onClose={() => setIsMerchOpen(false)} soundPacks={SOUND_PACKS} />
       <RecordingModal isOpen={!!recordedUrl} videoUrl={recordedUrl} onSave={handleSaveRecording} onDiscard={() => { if(recordedUrl) window.URL.revokeObjectURL(recordedUrl); setRecordedUrl(null); setRecordedBlob(null); }} />
-      
-      {/* Floating Shop Promo - appears after 30s */}
-      <FloatingShopPromo />
     </div>
   );
 };

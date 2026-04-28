@@ -149,13 +149,13 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           </div>
       </div>
 
-      {/* Merch Button */}
+      {/* Store Link */}
       <div className="mt-4 w-full">
-         <button onClick={onOpenMerch} className="w-full group relative overflow-hidden rounded-lg bg-gradient-to-r from-indigo-900 to-purple-900 p-4 text-left transition-transform hover:scale-[1.02]">
+         <a href="https://voibecode-shop.fourthwall.com/" target="_blank" rel="noopener noreferrer" className="block w-full group relative overflow-hidden rounded-lg bg-gradient-to-r from-indigo-900 to-purple-900 p-4 text-left transition-transform hover:scale-[1.02] no-underline">
             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="text-[10px] font-mono text-pink-300 mb-1">UNLOCK_ASSETS</div>
-            <div className="font-bold text-white">VoibeStore</div>
-         </button>
+            <div className="text-[10px] font-mono text-pink-300 mb-1">OFFICIAL MERCH</div>
+            <div className="font-bold text-white">VoibeCode Store →</div>
+         </a>
       </div>
 
     </div>

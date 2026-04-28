@@ -7,21 +7,22 @@ const LOOMSTATION_URL = 'https://loomstation.com';
 export const ShopSidebar: React.FC = () => {
   return (
     <div className="shop-sidebar-authentic">
-      {/* ── Store Banner (top) ── */}
+      {/* ── Loomstation Banner (top) ── */}
       <a
-        href={SHOP_URL}
+        href={LOOMSTATION_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="shop-sidebar-store-banner"
+        className="shop-sidebar-loom-banner"
+        style={{ marginBottom: '12px' }}
       >
         <img
-          src="/images/store/store_home.png"
-          alt="VoibeCode Store"
-          className="shop-sidebar-store-banner-img"
+          src="/images/loomstation/home.png"
+          alt="Loomstation — Prediction Market Analytics"
+          className="shop-sidebar-loom-banner-img"
         />
-        <div className="shop-sidebar-store-banner-overlay">
-          <span className="shop-sidebar-store-banner-label">VOIBECODE STORE</span>
-          <span className="shop-sidebar-store-banner-cta">Browse All →</span>
+        <div className="shop-sidebar-loom-banner-overlay">
+          <span className="shop-sidebar-loom-banner-label">LOOMSTATION</span>
+          <span className="shop-sidebar-loom-banner-sub">Prediction Market Analytics</span>
         </div>
       </a>
 
@@ -63,24 +64,6 @@ export const ShopSidebar: React.FC = () => {
           </div>
         </a>
       </div>
-
-      {/* ── Loomstation Banner (bottom) ── */}
-      <a
-        href={LOOMSTATION_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="shop-sidebar-loom-banner"
-      >
-        <img
-          src="/images/loomstation/home.png"
-          alt="Loomstation"
-          className="shop-sidebar-loom-banner-img"
-        />
-        <div className="shop-sidebar-loom-banner-overlay">
-          <span className="shop-sidebar-loom-banner-label">LOOMSTATION</span>
-          <span className="shop-sidebar-loom-banner-sub">Prediction Market Analytics</span>
-        </div>
-      </a>
     </div>
   );
 };
