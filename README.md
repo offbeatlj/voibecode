@@ -29,7 +29,7 @@ node ~/.gemini/config/plugins/voibecode/bridge.mjs
 
 - **Antigravity 2.0:** Native plugin + Auxiliary Side Pane installed directly into `~/.gemini/config/plugins/voibecode`.
 - **Claude Code CLI:** Automatically merges lightweight `PostToolUse` & `Stop` lifecycle hooks into `~/.claude/settings.json` when installed.
-- **VS Code · Cursor · Windsurf:** Ultra-light `<26 KB` `.vsix` extension (`packages/extension`) with zero bundled audio bloat.
+- **VS Code · Cursor · Windsurf:** Live on **[Open VSX Registry](https://open-vsx.org/extension/voibecode/voibecode)** (`voibecode.voibecode`, `<40 KB` `.vsix` extension with zero bundled audio bloat).
 
 ---
 
