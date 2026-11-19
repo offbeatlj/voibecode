@@ -1,14 +1,15 @@
 {
   "name": "voibecode",
-  "displayName": "VoibeCode",
-  "description": "Zero-chrome WebGL twilight wait screen and idle screensaver that chimes when background AI agents stall",
+  "displayName": "VoibeCode — AI Agent Stall Watcher & Radar",
+  "description": "Air traffic control for AI coding agents — detects stalled terminals (>10s), chimes on stalls, and dims to a zero-chrome twilight screen. 100% local metadata, zero telemetry.",
   "version": "1.0.0",
   "publisher": "voibecode",
   "license": "MIT",
+  "icon": "icon.png",
   "homepage": "https://voibecode.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/voibecode/voibecode"
+    "url": "https://github.com/offbeatlj/voibecode"
   },
   "sponsor": {
     "url": "https://voibecode.com"
@@ -22,12 +23,13 @@
   ],
   "keywords": [
     "voibecode",
-    "twilight",
-    "oklch",
-    "webgl",
     "ai-agent",
-    "terminal",
-    "screensaver"
+    "claude-code",
+    "cursor",
+    "antigravity",
+    "stall-alert",
+    "terminal-watcher",
+    "twilight"
   ],
   "activationEvents": [
     "onStartupFinished"
