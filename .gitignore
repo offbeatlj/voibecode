@@ -1,24 +1,32 @@
+# Dependencies & Build Artifacts
+node_modules
+dist
+dist-ssr
+*.tsbuildinfo
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Wrangler & Cloudflare
+.wrangler
+
+# Extension & Plugin Bundles (built by npm run package:all)
+*.vsix
+packages/web/public/*.zip
+
+# Local Runtime Data
+packages/server/.data
+
 # Logs
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
+# OS / Editor
+.DS_Store
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?

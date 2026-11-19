@@ -1,0 +1,30 @@
+{
+  "voibecode-stall-watcher": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node ./hooks/watcher-hook.mjs pre",
+        "timeout": 5
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/watcher-hook.mjs tool",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node ./hooks/watcher-hook.mjs stop",
+        "timeout": 5
+      }
+    ]
+  }
+}

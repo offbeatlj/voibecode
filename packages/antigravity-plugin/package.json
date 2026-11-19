@@ -1,0 +1,13 @@
+{
+  "name": "@voibecode/antigravity-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json --noEmit && esbuild sidecars/voibecode/src/app.ts --bundle --platform=browser --format=iife --minify --outfile=sidecars/voibecode/app.js"
+  },
+  "dependencies": {
+    "@voibecode/shared": "*"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "name": "voibecode",
+  "displayName": "VoibeCode",
+  "description": "Zero-chrome WebGL twilight wait screen and idle screensaver that chimes when background AI agents stall",
+  "version": "1.0.0",
+  "publisher": "voibecode",
+  "license": "MIT",
+  "homepage": "https://voibecode.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/voibecode/voibecode"
+  },
+  "sponsor": {
+    "url": "https://voibecode.com"
+  },
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "voibecode",
+    "twilight",
+    "oklch",
+    "webgl",
+    "ai-agent",
+    "terminal",
+    "screensaver"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "voibecode.openWaitState",
+        "title": "VoibeCode: Open Wait-State Sky"
+      },
+      {
+        "command": "voibecode.enterLicenseKey",
+        "title": "VoibeCode: Enter License Key (VC-...)"
+      },
+      {
+        "command": "voibecode.toggleEnabled",
+        "title": "VoibeCode: Toggle Enabled"
+      }
+    ],
+    "configuration": {
+      "title": "VoibeCode",
+      "properties": {
+        "voibecode.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable VoibeCode zero-chrome twilight wait screen on terminal execution and agent stalls."
+        },
+        "voibecode.stallThresholdSeconds": {
+          "type": "number",
+          "default": 10,
+          "minimum": 3,
+          "maximum": 300,
+          "description": "Seconds with zero terminal stdout bytes before transitioning to STALLED and sounding the 528->792Hz harmonic chime."
+        },
+        "voibecode.idleTimeoutSeconds": {
+          "type": "number",
+          "default": 180,
+          "minimum": 0,
+          "description": "Seconds of focused editor inactivity before launching screensaver mode (set to 0 to disable)."
+        },
+        "voibecode.allowStallChimeWhenMuted": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play the 528->792Hz stall alert chime even when ambient synth drone audio is OFF."
+        },
+        "voibecode.shufflePatronSkies": {
+          "type": "boolean",
+          "default": false,
+          "description": "Rotate across claimed patron and maker skies automatically when wait state launches."
+        },
+        "voibecode.showPatronCredits": {
+          "type": "boolean",
+          "default": true,
+          "description": "Display bottom hairline brand attribution on claimed patron and maker skies."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json --noEmit && esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --minify --outfile=dist/extension.js && esbuild src/webview-client.ts --bundle --platform=browser --format=iife --minify --outfile=dist/webview-client.js",
+    "package": "npm run build && vsce package --no-dependencies -o ../../packages/web/public/voibecode-1.0.0.vsix"
+  },
+  "dependencies": {
+    "@voibecode/shared": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/vscode": "^1.93.0",
+    "@vscode/vsce": "^3.2.2"
+  }
+}

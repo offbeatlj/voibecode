@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoibeCode // Studio — Twilight Code Synth</title>
+    <meta
+      name="description"
+      content="Lowkey zero-chrome live-coding synth workstation over the VoibeCode OKLCH WebGL twilight sky with Australian voice callouts."
+    />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <canvas id="sky-canvas" aria-hidden="true"></canvas>
+
+    <div class="chrome-shell">
+      <header class="site-header">
+        <div class="hairline-row">
+          <div class="hairline-group">
+            <a class="hairline-link hairline-brand" href="/">VOIBECODE // CODE SYNTH</a>
+            <span id="studio-voice-readout" class="voice-readout">AU VOICE READY // WORKSPACE: VOIBCODE</span>
+          </div>
+
+          <nav class="hairline-group" aria-label="Navigation">
+            <a class="hairline-link" href="/">← VOIBECODE RADAR</a>
+            <a class="hairline-link is-active" href="/studio">CODE SYNTH</a>
+            <a class="hairline-link" href="/objects">OBJECTS</a>
+          </nav>
+        </div>
+
+        <div class="subnav-row">
+          <div id="preset-bar" class="hairline-group"></div>
+          <div class="hairline-group">
+            <button id="studio-voice-toggle" class="hairline-btn is-active" type="button">[ AU VOICE: ON ]</button>
+            <button id="studio-voice-test" class="hairline-btn" type="button">[ 🔊 CALLOUT ]</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="studio-stage">
+        <div class="studio-split">
+          <section class="studio-editor-col" aria-label="Code Sequencer">
+            <div class="studio-col-header">
+              <span>SYNTAX BUFFER</span>
+              <span id="studio-compile-status">READY // LIVE HOT-SWAP</span>
+            </div>
+            <textarea
+              id="studio-code"
+              class="studio-textarea"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+              aria-label="VoibeCode Synth Code"
+            ></textarea>
+          </section>
+
+          <section class="studio-grid-col" aria-label="16-Step Matrix">
+            <div class="studio-col-header">
+              <span>16-STEP HARMONIC GRID</span>
+              <span id="studio-telemetry">BPM 96 · STEP 01/16 · #FF7B6B</span>
+            </div>
+            <div id="studio-sequencer" class="studio-sequencer"></div>
+            <canvas id="studio-scope" class="studio-scope" height="68"></canvas>
+          </section>
+        </div>
+
+        <section id="syntax-drawer" class="syntax-drawer" hidden>
+          <div>VOICES: kick · lofi_kick · snare · lofi_snare · hat · openhat · clap · rim · bass · rhodes · pad · chime · pluck · lead · fx</div>
+          <div>DYNAMICS: x (hit) · ! (accent) · ? (ghost) · ~ (hold) · . (rest) · "x." * 8</div>
+          <div>PARAMS: bpm = 96 · swing = 0.08 · reverb = 0.55 · delay = 0.28 · drone = on · scale = "Coding Down Under" · sky = "#5BA8B8"</div>
+        </section>
+      </main>
+
+      <footer class="hairline-row">
+        <div class="hairline-group">
+          <button id="play-toggle-btn" class="hairline-btn is-active" type="button">
+            [ ▶ RUN_CODE ]
+          </button>
+          <button id="stop-btn" class="hairline-btn" type="button">
+            [ ■ STOP ]
+          </button>
+          <button id="drone-btn" class="hairline-btn" type="button">
+            [ DRONE OFF ]
+          </button>
+        </div>
+
+        <div class="hairline-group">
+          <button id="syntax-toggle-btn" class="hairline-btn" type="button">
+            [ ? SYNTAX ]
+          </button>
+          <span class="track-meta">CTRL/CMD+ENTER: RUN · CLICK CELLS TO EDIT</span>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/studio.ts"></script>
+  </body>
+</html>

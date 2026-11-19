@@ -1,21 +1,24 @@
 {
   "name": "voibecode",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "description": "VoibeCode — Air Traffic Control for AI Coding Agents (Multi-workspace radar, away-mode phone alerts, voice triage & daily ship receipts)",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/worker && npm run build --workspace=packages/extension && npm run build --workspace=packages/antigravity-plugin && npm run package:antigravity && npm run build --workspace=packages/web",
+    "typecheck": "npm run build --workspace=packages/shared && npm run typecheck --workspace=packages/shared && npm run typecheck --workspace=packages/worker && npm run typecheck --workspace=packages/web && npm run typecheck --workspace=packages/extension && npm run typecheck --workspace=packages/antigravity-plugin",
+    "dev:web": "npm run dev --workspace=packages/web",
+    "dev:worker": "npm run dev --workspace=packages/worker",
+    "package:extension": "npm run package --workspace=packages/extension",
+    "package:antigravity": "node scripts/package-antigravity.mjs",
+    "package:all": "npm run package:extension && npm run package:antigravity",
+    "start": "node packages/server/server.mjs"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "esbuild": "^0.25.0",
+    "typescript": "^5.8.2"
   }
 }

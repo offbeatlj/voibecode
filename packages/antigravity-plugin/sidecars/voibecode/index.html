@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoibeCode — Agent Radar</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="sky-canvas" aria-hidden="true"></canvas>
+
+    <div class="sidecar-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <span id="brand-dot" class="status-dot is-idle"></span>
+          <span class="brand-name">VoibeCode</span>
+        </div>
+        <button id="sim-stall-btn" class="btn-ghost" type="button">Test stall</button>
+      </header>
+
+      <!-- Live Status -->
+      <section class="card">
+        <div class="hero-row">
+          <div class="hero-copy">
+            <span id="hero-chip" class="state-chip is-idle">Standing by</span>
+            <h1 id="hero-title" class="hero-title">All agents quiet</h1>
+            <p id="hero-sub" class="hero-sub">Watching all workspaces locally.</p>
+          </div>
+          <div id="hero-timer" class="hero-timer">00:00</div>
+        </div>
+
+        <div class="controls-row">
+          <button id="voice-btn" class="toggle-chip is-on" type="button">
+            <span class="chip-dot"></span> Voice
+          </button>
+          <button id="audio-btn" class="toggle-chip" type="button">
+            <span class="chip-dot"></span> Focus Audio
+          </button>
+          <select id="cartridge-select" class="compact-select" aria-label="Soundscape">
+            <option value="coding-down-under">Down Under</option>
+            <option value="tape-field">Tape Field</option>
+            <option value="eno-airport">Eno 1978</option>
+            <option value="tokyo-rain">Tokyo Rain</option>
+          </select>
+        </div>
+        <div id="voice-line" class="voice-caption" hidden></div>
+      </section>
+
+      <!-- Active Workspaces Radar -->
+      <section class="card">
+        <div class="card-head">
+          <span class="card-title">Agent Radar</span>
+          <span id="ws-count" class="mono-muted">1 workspace</span>
+        </div>
+        <div id="ws-list" class="ws-list"></div>
+      </section>
+
+      <!-- Away Phone & Webhook Alerts -->
+      <section class="card">
+        <div class="card-head">
+          <div class="title-pair">
+            <span class="card-title">Away Alerts</span>
+            <span id="away-chip" class="state-chip is-idle">Off</span>
+          </div>
+          <button id="away-switch" class="switch-btn" type="button" role="switch" aria-checked="false" aria-label="Toggle Away Alerts">
+            <span class="switch-thumb"></span>
+          </button>
+        </div>
+        <p class="card-desc">Ping your phone via ntfy, Slack, or Discord when an agent stalls or loops.</p>
+        <div class="input-row">
+          <input id="ntfy-input" class="text-input mono" type="text" spellcheck="false" autocomplete="off" />
+          <button id="test-ping-btn" class="btn-secondary" type="button">Ping</button>
+        </div>
+        <div class="ping-row">
+          <a id="ntfy-link" class="inline-link" href="https://ntfy.sh/" target="_blank" rel="noopener noreferrer">ntfy.sh topic ↗</a>
+          <span id="ping-status" class="mono-muted"></span>
+        </div>
+      </section>
+
+      <!-- Compact Daily Velocity -->
+      <section class="card">
+        <div class="card-head">
+          <span class="card-title">Today</span>
+          <span id="streak-text" class="mono-muted">Best streak: 0</span>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-box">
+            <span class="metric-label">Flow Time</span>
+            <span id="m-flow" class="metric-value">0s</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Steps</span>
+            <span id="m-steps" class="metric-value">0</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Stalls</span>
+            <span id="m-stalls" class="metric-value">0</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Green</span>
+            <span id="m-green" class="metric-value is-green">100%</span>
+          </div>
+        </div>
+      </section>
+
+      <footer class="sidecar-footer">
+        100% local metadata · zero code stored
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

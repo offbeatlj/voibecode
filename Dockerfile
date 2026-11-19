@@ -1,34 +1,33 @@
-# Stage 1: Build the frontend, and install server dependencies
-FROM node:22 AS builder
+# Stage 1: Build monorepo workspaces + package IDE artifacts (.vsix & Antigravity .zip)
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# Copy all files from the current directory
-ARG CACHEBUST=3
-COPY . ./
-RUN echo "API_KEY=PLACEHOLDER" > ./.env
-RUN echo "GEMINI_API_KEY=PLACEHOLDER" >> ./.env
+COPY package.json tsconfig.base.json ./
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/worker/package.json ./packages/worker/
+COPY packages/web/package.json ./packages/web/
+COPY packages/extension/package.json ./packages/extension/
+COPY packages/antigravity-plugin/package.json ./packages/antigravity-plugin/
 
-# Install server dependencies
-WORKDIR /app/server
-RUN npm install
+RUN npm install --no-audit --no-fund
 
-# Install dependencies and build the frontend
-WORKDIR /app
-RUN mkdir dist
-RUN bash -c 'if [ -f package.json ]; then npm install && npm run build; fi'
+COPY packages ./packages
+COPY scripts ./scripts
 
+RUN npm run build:shared && npm run build --workspace=packages/antigravity-plugin && npm run package:all && npm run build --workspace=packages/web
 
-# Stage 2: Build the final server image
-FROM node:22
+# Stage 2: Minimal zero-dependency Node 22 production image
+FROM node:22-slim
 
 WORKDIR /app
 
-#Copy server files
-COPY --from=builder /app/server .
-# Copy built frontend assets from the builder stage
-COPY --from=builder /app/dist ./dist
+ENV NODE_ENV=production
+ENV PORT=3000
+
+COPY --from=builder /app/packages/web/dist ./packages/web/dist
+COPY --from=builder /app/packages/server/server.mjs ./packages/server/server.mjs
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "packages/server/server.mjs"]

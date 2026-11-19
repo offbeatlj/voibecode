@@ -1,0 +1,13 @@
+{
+  "name": "voibecode",
+  "displayName": "VoibeCode",
+  "description": "Zero-chrome OKLCH WebGL twilight wait screen, metadata-only stall chime, and lowkey code synth panel.",
+  "version": "1.0.0",
+  "homepage": "https://voibecode.com",
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "Open the VoibeCode twilight sidecar panel",
+    "Run a slow terminal command to test the 10s stall chime",
+    "Jam in the lowkey VoibeCode code synth"
+  ]
+}

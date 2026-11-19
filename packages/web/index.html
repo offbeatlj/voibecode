@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoibeCode — Air Traffic Control for AI Coding Agents</title>
+    <meta
+      name="description"
+      content="Watch every AI coding agent across Antigravity, Claude Code, and Cursor. Get instant voice callouts, phone push alerts on stalls or error loops, and daily AI ship receipts — 100% local metadata."
+    />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="canonical" href="https://voibecode.com/" />
+    <meta property="og:title" content="VoibeCode — Air Traffic Control for AI Coding Agents" />
+    <meta
+      property="og:description"
+      content="Never discover an AI agent stalled 15 minutes ago. Live multi-workspace radar, phone push alerts, voice triage, and shareable ship receipts."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://voibecode.com/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/radar.css" />
+  </head>
+  <body>
+    <canvas id="sky-canvas" aria-hidden="true"></canvas>
+
+    <div class="app-shell">
+      <!-- Single-row crisp header (never wraps at 340px) -->
+      <header class="topbar">
+        <div class="topbar-brand">
+          <span id="brand-dot" class="status-dot is-idle" aria-hidden="true"></span>
+          <span class="brand-name">VoibeCode</span>
+          <span id="pro-badge" class="badge-pro" hidden>PRO</span>
+        </div>
+
+        <div class="topbar-actions">
+          <a href="#downloads" class="btn-ghost desktop-only">Install</a>
+          <a href="#pricing" class="btn-ghost desktop-only">Pricing</a>
+          <button id="open-install-btn" class="btn-ghost mobile-only-btn" type="button">Connect</button>
+          <button id="open-receipt-top-btn" class="btn-ghost desktop-only" type="button">
+            Ship Card
+          </button>
+          <button id="open-pricing-btn" class="btn-primary-sm" type="button">Get Pro</button>
+        </div>
+      </header>
+
+      <!-- Post-Checkout License Fulfillment Banner -->
+      <div id="checkout-success-banner" class="notice-banner is-success" hidden>
+        <div class="notice-copy">
+          <strong>VoibeCode Pro unlocked.</strong>
+          <span id="checkout-key-text" class="mono">Validating session…</span>
+        </div>
+        <button id="copy-checkout-key-btn" class="btn-secondary-sm" type="button" hidden>Copy key</button>
+      </div>
+
+      <!-- Hosted Interactive Demo Notice (shown only on public web when no local IDE bridge is attached) -->
+      <div id="demo-mode-banner" class="notice-banner" hidden>
+        <div class="notice-copy">
+          <span class="state-chip is-running">Interactive Demo</span>
+          <span>Live simulation — test stall voice &amp; phone pings below, or install free to watch your local IDEs.</span>
+        </div>
+        <a href="#downloads" class="btn-secondary-sm">Install Free</a>
+      </div>
+
+      <!-- Main Responsive Grid (1-col at 340px, 2-col at >= 900px) -->
+      <main class="radar-grid">
+        <!-- LEFT COLUMN: Live Hero + Multi-Workspace Radar + Timeline -->
+        <div class="col-primary">
+          <!-- Hero Status & Audio Controls -->
+          <section class="card hero-card" aria-label="Live Agent Status">
+            <div class="hero-top">
+              <div class="hero-status-wrap">
+                <div class="hero-kicker-row">
+                  <span id="hero-state-pill" class="state-chip is-idle">Standing by</span>
+                  <span id="hero-workspace-tag" class="mono-muted">Voibcode</span>
+                </div>
+                <h1 id="hero-headline" class="hero-headline">All agents quiet</h1>
+                <p id="hero-subline" class="hero-subline">
+                  Watching Antigravity, Claude Code &amp; Cursor locally. Zero source code read.
+                </p>
+              </div>
+              <div class="hero-clock-wrap">
+                <div id="hero-timer" class="hero-timer">00:00</div>
+                <button id="simulate-stall-btn" class="btn-link" type="button">
+                  Simulate stall
+                </button>
+              </div>
+            </div>
+
+            <!-- Compact 1-row Voice & Focus Audio Bar -->
+            <div class="audio-strip">
+              <button id="voice-toggle-btn" class="toggle-chip is-on" type="button" aria-pressed="true">
+                <span class="chip-dot"></span>
+                <span>Voice Alerts</span>
+              </button>
+
+              <button id="ambient-toggle-btn" class="toggle-chip" type="button" aria-pressed="false">
+                <span class="chip-dot"></span>
+                <span>Focus Audio</span>
+              </button>
+
+              <label class="select-wrap" aria-label="Focus soundscape">
+                <select id="soundscape-select" class="compact-select">
+                  <option value="coding-down-under">Down Under · 94 BPM</option>
+                  <option value="tape-field">Tape Field · 82 BPM</option>
+                  <option value="eno-airport">Eno 1978 · Ambient</option>
+                  <option value="tokyo-rain">Tokyo Rain · 74 BPM</option>
+                </select>
+              </label>
+
+              <button id="desktop-notif-btn" class="btn-icon-text" type="button" title="Browser desktop notifications">
+                Desktop Ping: Off
+              </button>
+            </div>
+            <div id="voice-caption" class="voice-caption" hidden></div>
+          </section>
+
+          <!-- Multi-Workspace Agent Radar -->
+          <section class="card" aria-label="Active Workspaces Radar">
+            <div class="card-head">
+              <div class="card-title-group">
+                <h2 class="card-title">Agent Radar</h2>
+                <span id="radar-count-pill" class="count-pill">1 workspace</span>
+              </div>
+              <span id="radar-sync-label" class="mono-subtle">Live · 1s sync</span>
+            </div>
+
+            <div id="workspace-list" class="workspace-list" role="list"></div>
+          </section>
+
+          <!-- Metadata-Only Event Feed -->
+          <section class="card" aria-label="Recent Agent Events">
+            <div class="card-head">
+              <h2 class="card-title">Live Feed</h2>
+              <span class="mono-subtle">Metadata only · 0 code read</span>
+            </div>
+            <div id="event-feed" class="event-feed"></div>
+          </section>
+        </div>
+
+        <!-- RIGHT COLUMN: Away Phone Alerts + Velocity & Ship Card + Pro -->
+        <div class="col-secondary">
+          <!-- Killer Pro Feature: Away-Mode Phone & Webhook Alerts -->
+          <section class="card away-card" aria-label="Away-Mode Phone Alerts">
+            <div class="card-head">
+              <div class="card-title-group">
+                <h2 class="card-title">Away Alerts</h2>
+                <span id="away-status-pill" class="state-chip is-idle">Off</span>
+              </div>
+              <button
+                id="away-mode-switch"
+                class="switch-btn"
+                type="button"
+                role="switch"
+                aria-checked="false"
+                aria-label="Toggle Away Alerts"
+              >
+                <span class="switch-thumb"></span>
+              </button>
+            </div>
+
+            <p class="card-desc">
+              Step away from your desk. Get pinged on your phone or Slack the second an agent stalls, hits an error loop, or finishes.
+            </p>
+
+            <!-- Channel Segmented Control -->
+            <div class="segmented" role="tablist" aria-label="Alert Channel">
+              <button class="seg-btn is-active" data-channel="ntfy" type="button">Phone (ntfy)</button>
+              <button class="seg-btn" data-channel="slack" type="button">Slack</button>
+              <button class="seg-btn" data-channel="discord" type="button">Discord</button>
+              <button class="seg-btn" data-channel="webhook" type="button">Webhook</button>
+            </div>
+
+            <!-- ntfy Zero-Signup Phone Push Panel -->
+            <div id="channel-ntfy-panel" class="channel-panel">
+              <label class="field-label" for="ntfy-topic-input">Private phone topic (ntfy.sh — zero signup)</label>
+              <div class="input-row">
+                <input id="ntfy-topic-input" class="text-input mono" type="text" autocomplete="off" spellcheck="false" />
+                <button id="copy-ntfy-btn" class="btn-secondary-sm" type="button">Copy</button>
+              </div>
+              <div class="helper-row">
+                <a id="open-ntfy-link" class="inline-link" href="https://ntfy.sh/" target="_blank" rel="noopener noreferrer">
+                  Open topic in ntfy app / web ↗
+                </a>
+              </div>
+            </div>
+
+            <!-- Slack / Discord / Custom Webhook Panel -->
+            <div id="channel-webhook-panel" class="channel-panel" hidden>
+              <label id="webhook-url-label" class="field-label" for="webhook-url-input">Incoming Webhook URL</label>
+              <input
+                id="webhook-url-input"
+                class="text-input mono"
+                type="url"
+                placeholder="https://hooks.slack.com/services/..."
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+
+            <!-- Triggers & Stall Threshold -->
+            <div class="trigger-row">
+              <label class="check-label">
+                <input id="notify-stall-cb" type="checkbox" checked />
+                <span>Stall</span>
+              </label>
+              <label class="check-label">
+                <input id="notify-loop-cb" type="checkbox" checked />
+                <span>Error loop</span>
+              </label>
+              <label class="check-label">
+                <input id="notify-complete-cb" type="checkbox" checked />
+                <span>Finished</span>
+              </label>
+              <label class="threshold-wrap" title="Stall threshold">
+                <select id="stall-threshold-select" class="mini-select">
+                  <option value="10">10s</option>
+                  <option value="20">20s</option>
+                  <option value="30">30s</option>
+                  <option value="60">60s</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="away-footer">
+              <button id="test-alert-btn" class="btn-secondary" type="button">Send test ping</button>
+              <span id="test-alert-status" class="alert-status mono-muted"></span>
+            </div>
+          </section>
+
+          <!-- Today's Velocity + Viral Ship Receipt -->
+          <section class="card" aria-label="Today's Agent Velocity">
+            <div class="card-head">
+              <h2 class="card-title">Today's Velocity</h2>
+              <button id="open-receipt-btn" class="btn-link" type="button">Share Ship Card ↗</button>
+            </div>
+
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="metric-label">AI Flow Time</span>
+                <span id="stat-flow" class="metric-value">0s</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Agent Steps</span>
+                <span id="stat-steps" class="metric-value">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Stalls Rescued</span>
+                <span id="stat-stalls" class="metric-value">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Green Rate</span>
+                <span id="stat-green" class="metric-value is-green">100%</span>
+              </div>
+            </div>
+
+            <div class="cadence-wrap">
+              <div class="cadence-head">
+                <span class="mono-subtle">24h agent cadence</span>
+                <span id="stat-streak" class="mono-subtle">Best streak: 0</span>
+              </div>
+              <div id="cadence-bars" class="cadence-bars" aria-label="24-hour activity chart"></div>
+            </div>
+          </section>
+
+          <!-- Clean Monetization Card -->
+          <section id="pro-upsell-card" class="card pro-card" aria-label="VoibeCode Pro">
+            <div class="pro-head">
+              <div>
+                <h2 class="card-title">VoibeCode Pro</h2>
+                <p class="card-desc">Unlimited away push alerts, loop guardrails &amp; team digests.</p>
+              </div>
+              <div class="price-tag">
+                <span class="price-num">$39</span>
+                <span class="price-unit">once</span>
+              </div>
+            </div>
+            <div class="pro-actions">
+              <button id="upgrade-pro-btn" class="btn-primary" type="button" data-buy-tier="pro_lifetime">
+                Unlock Pro · $39
+              </button>
+              <button id="activate-key-open-btn" class="btn-ghost" type="button">Have a key?</button>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <!-- ══════════════ BELOW-THE-FOLD: DOWNLOADS & PURCHASABLE PRICING ══════════════ -->
+      <section id="downloads" class="catalog-section" aria-labelledby="downloads-heading">
+        <div class="section-head">
+          <div>
+            <h2 id="downloads-heading" class="section-title">Install Free Across Every AI IDE</h2>
+            <p class="section-sub">100% local metadata hooks. Never reads your code, prompts, or terminal text.</p>
+          </div>
+          <div class="qi-os-switch" role="group" aria-label="Installer OS">
+            <button class="qi-os-btn is-active" type="button" data-os="unix">macOS / Linux</button>
+            <button class="qi-os-btn" type="button" data-os="win">Windows</button>
+          </div>
+        </div>
+
+        <div class="quick-install-bar">
+          <span class="qi-label">1-line install</span>
+          <input
+            class="text-input mono qi-cmd-input"
+            type="text"
+            readonly
+            aria-label="Quick install command"
+            value="curl -fsSL https://voibecode.com/install.sh | sh"
+          />
+          <button class="btn-secondary-sm qi-copy-btn" type="button">Copy</button>
+        </div>
+
+        <div class="catalog-grid-3">
+          <div class="card">
+            <div class="card-head">
+              <strong class="card-title">Antigravity 2.0 Plugin</strong>
+              <span class="state-chip is-running">Native Sidecar</span>
+            </div>
+            <p class="card-desc">
+              Drops into <code>~/.gemini/config/plugins/voibecode</code>. Watches every workspace turn and tool call in the Auxiliary Side Pane.
+            </p>
+            <div class="pro-actions">
+              <a class="btn-primary" href="/voibecode-antigravity-plugin.zip" download="voibecode-antigravity-plugin.zip">
+                Download Plugin (.zip)
+              </a>
+              <button class="btn-ghost copy-agy-trigger" type="button">Copy path</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <strong class="card-title">VS Code · Cursor · Windsurf</strong>
+              <span class="state-chip is-idle">26 KB VSIX</span>
+            </div>
+            <p class="card-desc">
+              Zero-telemetry terminal stall watcher, instant <code>&lt;1ms</code> keypress dismissal, and built-in Web Audio chime.
+            </p>
+            <div class="pro-actions">
+              <a class="btn-primary" href="/voibecode-1.0.0.vsix" download="voibecode-1.0.0.vsix">
+                Download .vsix (26 KB)
+              </a>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <strong class="card-title">Claude Code CLI</strong>
+              <span class="state-chip is-idle">PostToolUse Hook</span>
+            </div>
+            <p class="card-desc">
+              Paste into <code>~/.claude/settings.json</code> to stream live tool activity, stalls, and completions into this radar.
+            </p>
+            <div class="pro-actions">
+              <button class="btn-secondary copy-claude-trigger" type="button">Copy Hook JSON</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" class="catalog-section" aria-labelledby="pricing-heading">
+        <div class="section-head">
+          <div>
+            <h2 id="pricing-heading" class="section-title">Simple Pricing for AI Builders</h2>
+            <p class="section-sub">Free locally forever. Instant Stripe checkout &amp; VC- license key delivery.</p>
+          </div>
+          <span id="page-billing-status" class="alert-status mono-muted"></span>
+        </div>
+
+        <div class="catalog-grid-3">
+          <div class="card tier-card">
+            <div class="tier-name">Free</div>
+            <div class="tier-price">$0 <span>forever</span></div>
+            <ul class="tier-list">
+              <li>Unlimited local multi-workspace radar</li>
+              <li>Australian voice &amp; desktop stall alerts</li>
+              <li>1200×675 daily AI Ship Receipts</li>
+              <li>Antigravity, Claude Code &amp; VSIX</li>
+            </ul>
+            <a class="btn-secondary" href="#downloads">Download Free</a>
+          </div>
+
+          <div class="card tier-card is-featured">
+            <div class="tier-top-row">
+              <span class="tier-name">Pro</span>
+              <span class="badge-pro">EARLY FOUNDER</span>
+            </div>
+            <div class="tier-price">$39 <span>lifetime · or $9/mo</span></div>
+            <ul class="tier-list">
+              <li>Unlimited Phone (ntfy), Slack &amp; Discord push</li>
+              <li>Runaway error-loop guardrails (3× errors)</li>
+              <li>All 4 studio focus soundscapes</li>
+              <li>Multi-machine sync &amp; custom thresholds</li>
+            </ul>
+            <div class="tier-buy-stack">
+              <button class="btn-primary" type="button" data-buy-tier="pro_lifetime">
+                Buy Pro Lifetime · $39
+              </button>
+              <button class="btn-link" type="button" data-buy-tier="pro_monthly">
+                Or subscribe monthly ($9/mo) →
+              </button>
+            </div>
+          </div>
+
+          <div class="card tier-card">
+            <div class="tier-name">Team</div>
+            <div class="tier-price">$19 <span>/ seat / mo</span></div>
+            <ul class="tier-list">
+              <li>Org-wide AI velocity &amp; stall insights</li>
+              <li>Automated Slack daily ship digests</li>
+              <li>Zero source code compliance posture</li>
+              <li>Priority IDE hook &amp; webhook support</li>
+            </ul>
+            <button class="btn-secondary" type="button" data-buy-tier="team">
+              Purchase Team · $19/seat
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiet Architectural Footer -->
+      <footer class="footer">
+        <span class="footer-note">100% local metadata · zero source code or prompts read</span>
+        <div class="footer-links">
+          <a href="/studio" class="footer-link">Code Synth</a>
+          <a href="/objects" class="footer-link">Objects</a>
+          <a href="/voibecode-antigravity-plugin.zip" download="voibecode-antigravity-plugin.zip" class="footer-link">Antigravity .zip</a>
+          <a href="/voibecode-1.0.0.vsix" download="voibecode-1.0.0.vsix" class="footer-link">VSIX (26KB)</a>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ══════════════ MODAL 1: SHAREABLE SHIP RECEIPT ══════════════ -->
+    <div id="modal-receipt" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="modal-receipt-title">
+      <div class="modal-sheet modal-wide">
+        <div class="modal-head">
+          <div>
+            <h2 id="modal-receipt-title" class="modal-title">AI Ship Receipt</h2>
+            <p class="modal-sub">1200×675 PNG ready for X, Slack, or daily build logs.</p>
+          </div>
+          <button class="btn-close" data-close-modal="modal-receipt" type="button" aria-label="Close">✕</button>
+        </div>
+
+        <canvas id="receipt-canvas" class="receipt-preview" width="1200" height="675"></canvas>
+
+        <div class="modal-actions">
+          <button id="download-receipt-btn" class="btn-primary" type="button">Download PNG</button>
+          <button id="copy-receipt-text-btn" class="btn-secondary" type="button">Copy Summary</button>
+          <button id="toggle-raw-json-btn" class="btn-ghost" type="button">Inspect Local JSON</button>
+        </div>
+
+        <pre id="raw-json-pre" class="code-block" hidden></pre>
+      </div>
+    </div>
+
+    <!-- ══════════════ MODAL 2: CONNECT IDES ══════════════ -->
+    <div id="modal-install" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="modal-install-title">
+      <div class="modal-sheet">
+        <div class="modal-head">
+          <div>
+            <h2 id="modal-install-title" class="modal-title">Connect Your AI IDEs</h2>
+            <p class="modal-sub">One radar across every workspace. Local hooks only — zero source code transmitted.</p>
+          </div>
+          <button class="btn-close" data-close-modal="modal-install" type="button" aria-label="Close">✕</button>
+        </div>
+
+        <div class="install-quick-wrap">
+          <div class="install-item-head">
+            <span class="field-label">Quick 1-line install</span>
+            <div class="qi-os-switch" role="group" aria-label="Modal Installer OS">
+              <button class="qi-os-btn is-active" type="button" data-os="unix">macOS / Linux</button>
+              <button class="qi-os-btn" type="button" data-os="win">Windows</button>
+            </div>
+          </div>
+          <div class="quick-install-bar is-compact">
+            <input
+              class="text-input mono qi-cmd-input"
+              type="text"
+              readonly
+              aria-label="Quick install command"
+              value="curl -fsSL https://voibecode.com/install.sh | sh"
+            />
+            <button class="btn-secondary-sm qi-copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+
+        <div class="install-list">
+          <div class="install-item">
+            <div class="install-item-head">
+              <strong>Antigravity 2.0</strong>
+              <span class="state-chip is-running">Native Sidecar</span>
+            </div>
+            <p class="card-desc">Unzip into <code>~/.gemini/config/plugins/voibecode</code> to watch every workspace turn automatically.</p>
+            <div class="install-btn-row">
+              <a class="btn-primary-sm" href="/voibecode-antigravity-plugin.zip" download="voibecode-antigravity-plugin.zip">
+                Download Plugin (.zip)
+              </a>
+              <button class="btn-secondary-sm copy-agy-trigger" type="button">Copy path</button>
+            </div>
+          </div>
+
+          <div class="install-item">
+            <div class="install-item-head">
+              <strong>Claude Code CLI</strong>
+              <span class="state-chip is-idle">PostToolUse Hook</span>
+            </div>
+            <p class="card-desc">Add to <code>~/.claude/settings.json</code> to pipe live stalls and completions straight here.</p>
+            <div class="install-btn-row">
+              <button class="btn-secondary-sm copy-claude-trigger" type="button">Copy settings.json snippet</button>
+            </div>
+          </div>
+
+          <div class="install-item">
+            <div class="install-item-head">
+              <strong>VS Code · Cursor · Windsurf</strong>
+              <span class="state-chip is-idle">26 KB VSIX</span>
+            </div>
+            <p class="card-desc">Zero-chrome stall watcher &amp; twilight wait screen with zero bundled audio bloat.</p>
+            <div class="install-btn-row">
+              <a class="btn-primary-sm" href="/voibecode-1.0.0.vsix" download="voibecode-1.0.0.vsix">
+                Download voibecode-1.0.0.vsix
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ MODAL 3: PRICING & PRO LICENSE ══════════════ -->
+    <div id="modal-pricing" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="modal-pricing-title">
+      <div class="modal-sheet modal-wide">
+        <div class="modal-head">
+          <div>
+            <h2 id="modal-pricing-title" class="modal-title">Simple Pricing for AI Builders</h2>
+            <p class="modal-sub">Free locally forever. Upgrade for away-mode phone alerts &amp; team velocity.</p>
+          </div>
+          <button class="btn-close" data-close-modal="modal-pricing" type="button" aria-label="Close">✕</button>
+        </div>
+
+        <div class="pricing-grid">
+          <div class="tier-card">
+            <div class="tier-name">Free</div>
+            <div class="tier-price">$0 <span>forever</span></div>
+            <ul class="tier-list">
+              <li>Unlimited local multi-workspace radar</li>
+              <li>Australian voice &amp; desktop stall alerts</li>
+              <li>1200×675 daily AI Ship Receipts</li>
+              <li>Antigravity, Claude Code &amp; VSIX</li>
+            </ul>
+            <button class="btn-secondary" data-close-modal="modal-pricing" type="button">Included</button>
+          </div>
+
+          <div class="tier-card is-featured">
+            <div class="tier-top-row">
+              <span class="tier-name">Pro</span>
+              <span class="badge-pro">EARLY FOUNDER</span>
+            </div>
+            <div class="tier-price">$39 <span>lifetime · or $9/mo</span></div>
+            <ul class="tier-list">
+              <li>Unlimited Phone (ntfy), Slack &amp; Discord push</li>
+              <li>Runaway error-loop guardrails</li>
+              <li>All 4 studio focus soundscapes</li>
+              <li>Multi-machine sync &amp; custom thresholds</li>
+            </ul>
+            <div class="tier-buy-stack">
+              <button class="btn-primary" type="button" data-buy-tier="pro_lifetime">Unlock Pro · $39</button>
+              <button class="btn-link" type="button" data-buy-tier="pro_monthly">Or $9/mo monthly →</button>
+            </div>
+          </div>
+
+          <div class="tier-card">
+            <div class="tier-name">Team</div>
+            <div class="tier-price">$19 <span>/ seat / mo</span></div>
+            <ul class="tier-list">
+              <li>Org-wide AI velocity &amp; stall insights</li>
+              <li>Automated Slack daily ship digests</li>
+              <li>Zero source code compliance posture</li>
+              <li>Priority IDE hook support</li>
+            </ul>
+            <button class="btn-secondary" type="button" data-buy-tier="team">Start Team · $19/seat</button>
+          </div>
+        </div>
+
+        <div class="license-bar">
+          <label class="field-label" for="license-key-input">Already have a license key?</label>
+          <div class="input-row">
+            <input id="license-key-input" class="text-input mono" type="text" placeholder="VC-PRO-XXXX-XXXX" autocomplete="off" />
+            <button id="activate-license-btn" class="btn-secondary-sm" type="button">Activate</button>
+          </div>
+          <span id="license-feedback" class="alert-status mono-muted"></span>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
