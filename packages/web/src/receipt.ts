@@ -143,7 +143,7 @@ export function renderSessionReceipt(
 
   // Right Hero: Workspaces pill stack (always prioritize active workspace first)
   const rawWs = [
-    stats.workspaceName || 'Voibcode',
+    stats.workspaceName || 'workspace',
     ...(Array.isArray(stats.workspacesTouched) ? stats.workspacesTouched : []),
   ];
   const wsList = Array.from(new Set(rawWs.filter(Boolean))).slice(0, 4);

@@ -40,7 +40,7 @@ class VoibeStudioApp {
   private compiled: StudioCompileResult;
   private currentSkyHex = FLAGSHIP_HEX;
   private manualDroneOverride: boolean | null = null;
-  private workspaceName = 'Voibcode';
+  private workspaceName = 'workspace';
 
   private isPlaying = false;
   private currentStep = 0;

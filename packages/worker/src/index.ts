@@ -721,7 +721,7 @@ async function handlePublicTestAlert(request: Request): Promise<Response> {
   }
 
   const channel = body.channel || 'ntfy';
-  const ws = String(body.workspace || 'Voibcode').slice(0, 32);
+  const ws = String(body.workspace || 'workspace').slice(0, 32);
   const start = Date.now();
 
   try {

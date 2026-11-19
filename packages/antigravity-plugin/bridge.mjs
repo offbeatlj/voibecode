@@ -134,8 +134,8 @@ async function dispatchExternalAlert(cfg, opts) {
 function getDefaultStats() {
   const now = Date.now();
   return {
-    workspaceName: 'Voibcode',
-    workspacesTouched: ['Voibcode'],
+    workspaceName: 'workspace',
+    workspacesTouched: ['workspace'],
     workspaces: [],
     state: 'IDLE',
     startedAt: null,
@@ -186,7 +186,7 @@ function getLiveState() {
           ts: now,
           kind: 'STALL',
           label: `Stalled >${cfg.stallThresholdSec}s`,
-          workspace: raw.workspaceName || 'Voibcode',
+          workspace: raw.workspaceName || 'workspace',
           durationMs: elapsedMs,
         });
         raw.recentEvents = events.slice(0, 12);
@@ -203,7 +203,7 @@ function getLiveState() {
     const rawMap = raw.workspacesMap && typeof raw.workspacesMap === 'object' ? raw.workspacesMap : {};
     const touched = Array.isArray(raw.workspacesTouched)
       ? raw.workspacesTouched
-      : [raw.workspaceName || 'Voibcode'];
+      : [raw.workspaceName || 'workspace'];
     const merged = new Map(Object.entries(rawMap));
     for (const name of touched) {
       if (!name || merged.has(name)) continue;
@@ -423,7 +423,7 @@ const server = createServer(async (req, res) => {
         body: 'Away Alerts are live. You will be pinged when an AI agent stalls, loops, or finishes.',
         priority: 'default',
         tags: 'white_check_mark',
-        workspace: String(body?.workspace || 'Voibcode'),
+        workspace: String(body?.workspace || 'workspace'),
         event: 'test',
       });
       return sendJson(res, result.ok ? 200 : 502, result);

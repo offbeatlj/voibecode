@@ -78,7 +78,7 @@ class VoibeSidecarRadar {
   private voiceEnabled = true;
   private simUntil = 0;
   private lastWsState = new Map<string, string>();
-  private latestWorkspace = 'Voibcode';
+  private latestWorkspace = 'workspace';
   private alertCfg: AwayAlertConfig = {
     awayMode: false,
     channel: 'ntfy',
@@ -152,7 +152,7 @@ class VoibeSidecarRadar {
       const res = await fetch('api/state');
       if (!res.ok) return;
       const data = (await res.json()) as SidecarState;
-      this.latestWorkspace = data.workspaceName || 'Voibcode';
+      this.latestWorkspace = data.workspaceName || 'workspace';
       this.render(data);
     } catch {
       // Ignore
@@ -166,7 +166,7 @@ class VoibeSidecarRadar {
         ? data.workspaces.map((w) => ({ ...w }))
         : [
             {
-              name: data.workspaceName || 'Voibcode',
+              name: data.workspaceName || 'workspace',
               state: data.state || 'IDLE',
               startedAt: data.startedAt,
               lastActivityAt: data.lastActivityAt,

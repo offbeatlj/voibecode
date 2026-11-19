@@ -182,7 +182,7 @@ function buildEnrichedState(raw: Record<string, unknown>, cfg: StoredAlertConfig
       : {};
   const touched = Array.isArray(raw.workspacesTouched)
     ? (raw.workspacesTouched as string[])
-    : [String(raw.workspaceName || 'Voibcode')];
+    : [String(raw.workspaceName || 'workspace')];
 
   const merged = new Map<string, Record<string, unknown>>();
   for (const [k, v] of Object.entries(rawMap)) {
@@ -322,7 +322,7 @@ function voibecodeLocalBridge(): Plugin {
             body: 'Away Alerts are live. You will be pinged the moment an AI agent stalls, loops, or finishes.',
             priority: 'default',
             tags: 'white_check_mark',
-            workspace: String(body.workspace || 'Voibcode'),
+            workspace: String(body.workspace || 'workspace'),
             event: 'test',
           });
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -379,8 +379,8 @@ function voibecodeLocalBridge(): Plugin {
             JSON.stringify(
               buildEnrichedState(
                 {
-                  workspaceName: 'Voibcode',
-                  workspacesTouched: ['Voibcode'],
+                  workspaceName: 'workspace',
+                  workspacesTouched: ['workspace'],
                   state: 'IDLE',
                   startedAt: null,
                   lastActivityAt: now,

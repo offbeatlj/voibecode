@@ -40,7 +40,7 @@ Senior developers shouldn't have to take anyone's word on trust. Audit our hook 
 - **[packages/antigravity-plugin/hooks/watcher-hook.mjs](packages/antigravity-plugin/hooks/watcher-hook.mjs)**
 
 What VoibeCode reads & stores locally (`~/.gemini/voibecode-state.json`):
-- Workspace folder **basename** (e.g. `voibcode`, never full filesystem paths)
+- Workspace folder **basename** (e.g. `my-app`, never full filesystem paths)
 - Event timestamps, durations, tool categories (`command`, `edit`, `read`, `subagent`), and error/streak counters
 
 What VoibeCode **never** inspects, stores, or transmits:

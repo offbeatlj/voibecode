@@ -78,7 +78,7 @@ function buildHostedDemoState(bootTime: number): LiveStatePayload {
 
   const workspaces: WorkspaceAgentStatus[] = [
     {
-      name: 'voibcode',
+      name: 'demo-app',
       state: 'RUNNING',
       startedAt: now - runningElapsed,
       lastActivityAt: now - (runningElapsed % 9_000),
@@ -125,8 +125,8 @@ function buildHostedDemoState(bootTime: number): LiveStatePayload {
   ];
 
   return {
-    workspaceName: 'voibcode',
-    workspacesTouched: ['voibcode', 'api-billing', 'web-dashboard'],
+    workspaceName: 'demo-app',
+    workspacesTouched: ['demo-app', 'api-billing', 'web-dashboard'],
     workspaces,
     state: 'RUNNING',
     startedAt: now - runningElapsed,
@@ -149,8 +149,8 @@ function buildHostedDemoState(bootTime: number): LiveStatePayload {
     voiceCalloutsCount: 19,
     hourlyActivity: hourly,
     recentEvents: [
-      { ts: now - 4_000, kind: 'TOOL', label: 'Editing files', workspace: 'voibcode', durationMs: 3_800 },
-      { ts: now - 18_000, kind: 'TOOL', label: 'Running command', workspace: 'voibcode', durationMs: 6_400 },
+      { ts: now - 4_000, kind: 'TOOL', label: 'Editing files', workspace: 'demo-app', durationMs: 3_800 },
+      { ts: now - 18_000, kind: 'TOOL', label: 'Running command', workspace: 'demo-app', durationMs: 6_400 },
       { ts: now - 240_000, kind: 'COMPLETE', label: 'Turn complete', workspace: 'api-billing', durationMs: 12_200 },
       { ts: now - 310_000, kind: 'STALL', label: 'Stalled >10s', workspace: 'api-billing', durationMs: 14_100 },
     ],
@@ -574,7 +574,7 @@ class VoibeRadarApp {
         ? data.workspaces.map((w) => ({ ...w }))
         : [
             {
-              name: data.workspaceName || 'Voibcode',
+              name: data.workspaceName || 'workspace',
               state: data.state || 'IDLE',
               startedAt: data.startedAt,
               lastActivityAt: data.lastActivityAt,
@@ -652,7 +652,7 @@ class VoibeRadarApp {
       this.brandDot.className = 'status-dot is-idle';
       this.heroStatePill.className = 'state-chip is-idle';
       this.heroStatePill.textContent = 'Standing by';
-      this.heroWorkspaceTag.textContent = primary?.name || 'Voibcode';
+      this.heroWorkspaceTag.textContent = primary?.name || 'workspace';
       this.heroHeadline.textContent = 'All agents quiet';
       this.heroSubline.textContent = `${data.totalToolCalls} steps & ${data.stallsCaught} stalls rescued today across ${workspaces.length} workspace${workspaces.length === 1 ? '' : 's'}.`;
       this.heroTimer.textContent = formatFlowDuration(data.totalFlowMs);
@@ -824,7 +824,7 @@ class VoibeRadarApp {
 
     this.simulateStallBtn.addEventListener('click', () => {
       this.simulatedStallUntil = Date.now() + 4500;
-      const ws = this.latestState.workspaceName || 'Voibcode';
+      const ws = this.latestState.workspaceName || 'workspace';
       this.renderAll(this.latestState);
       if (this.voiceEnabled) {
         void this.audio.triggerStallChime(ws);

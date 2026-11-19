@@ -71,7 +71,7 @@ export class TwilightAudioEngine {
   private ctx: AudioContext | null = null;
   private mode: AudioMode = 'OFF';
   private cartridgeId: VoibeCartridgeId = 'coding-down-under';
-  private workspaceName = 'Voibcode';
+  private workspaceName = 'workspace';
   private voiceEnabled = true;
   private mix: AudioStemMix = { ...DEFAULT_AUDIO_MIX };
 
