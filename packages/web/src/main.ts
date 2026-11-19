@@ -23,6 +23,7 @@ interface LiveStatePayload extends VoibeTelemetryStats {
 }
 
 const STORAGE_PRO_KEY = 'voibecode.pro.license.v2';
+const STORAGE_ROLE_KEY = 'voibecode.pro.role.v2';
 const STORAGE_PREFS_KEY = 'voibecode.radar.prefs.v2';
 const STORAGE_ALERTS_KEY = 'voibecode.radar.alerts.v2';
 
@@ -283,7 +284,8 @@ class VoibeRadarApp {
     try {
       const lic = localStorage.getItem(STORAGE_PRO_KEY);
       if (lic && lic.startsWith('VC-')) {
-        this.setProUnlocked(true);
+        const isFounder = localStorage.getItem(STORAGE_ROLE_KEY) === 'founder';
+        this.setProUnlocked(true, isFounder);
       }
       const savedAlerts = localStorage.getItem(STORAGE_ALERTS_KEY);
       if (savedAlerts) {
@@ -339,9 +341,10 @@ class VoibeRadarApp {
     }
   }
 
-  private setProUnlocked(unlocked: boolean): void {
+  private setProUnlocked(unlocked: boolean, isFounder = false): void {
     this.proBadge.hidden = !unlocked;
-    this.openPricingBtn.textContent = unlocked ? 'Pro Active' : 'Get Pro';
+    this.proBadge.textContent = isFounder ? 'FOUNDER' : 'PRO';
+    this.openPricingBtn.textContent = unlocked ? (isFounder ? 'Founder' : 'Pro Active') : 'Get Pro';
     this.proUpsellCard.hidden = unlocked;
   }
 
@@ -1106,7 +1109,7 @@ class VoibeRadarApp {
     const key = this.licenseKeyInput.value.trim().toUpperCase();
     if (!/^VC-(?:(?:PRO|TEAM)-)?[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key)) {
       this.licenseFeedback.className = 'alert-status is-err mono-muted';
-      this.licenseFeedback.textContent = 'Enter a valid VC-PRO-XXXX-XXXX license key.';
+      this.licenseFeedback.textContent = 'Enter a valid VC-XXXX-XXXX or VC-PRO-XXXX-XXXX license key.';
       return;
     }
 
@@ -1116,11 +1119,22 @@ class VoibeRadarApp {
     try {
       const res = await fetch(`/api/license/${encodeURIComponent(key)}`);
       if (res.ok) {
-        localStorage.setItem(STORAGE_PRO_KEY, key);
-        this.setProUnlocked(true);
-        this.licenseFeedback.className = 'alert-status is-ok mono-muted';
-        this.licenseFeedback.textContent = 'License verified & Pro unlocked ✓';
-        return;
+        const data = (await res.json().catch(() => ({}))) as { valid?: boolean; founder?: boolean };
+        if (data.valid !== false) {
+          const isFounder = Boolean(data.founder);
+          localStorage.setItem(STORAGE_PRO_KEY, key);
+          if (isFounder) {
+            localStorage.setItem(STORAGE_ROLE_KEY, 'founder');
+          } else {
+            localStorage.removeItem(STORAGE_ROLE_KEY);
+          }
+          this.setProUnlocked(true, isFounder);
+          this.licenseFeedback.className = 'alert-status is-ok mono-muted';
+          this.licenseFeedback.textContent = isFounder
+            ? 'Founder license verified & unlocked ✓'
+            : 'License verified & Pro unlocked ✓';
+          return;
+        }
       }
       if (res.status === 404) {
         const err = (await res.json().catch(() => ({}))) as { error?: string };
@@ -1135,8 +1149,9 @@ class VoibeRadarApp {
       // Offline / local preview fallback
     }
 
+    localStorage.removeItem(STORAGE_ROLE_KEY);
     localStorage.setItem(STORAGE_PRO_KEY, key);
-    this.setProUnlocked(true);
+    this.setProUnlocked(true, false);
     this.licenseFeedback.className = 'alert-status is-ok mono-muted';
     this.licenseFeedback.textContent = 'Pro unlocked locally ✓';
   }

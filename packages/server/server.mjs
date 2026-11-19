@@ -97,6 +97,19 @@ function generateLicenseKey(tier) {
   return `VC-PRO-${p1}-${p2}`;
 }
 
+function matchFounderKey(candidate) {
+  const configured = (process.env.FOUNDER_LICENSE_KEYS || '')
+    .split(',')
+    .map((k) => k.trim().toUpperCase())
+    .filter(Boolean);
+  if (configured.length === 0) return false;
+  const candBuf = Buffer.from(candidate, 'utf8');
+  return configured.some((expected) => {
+    const expBuf = Buffer.from(expected, 'utf8');
+    return expBuf.length === candBuf.length && timingSafeEqual(expBuf, candBuf);
+  });
+}
+
 function verifyStripeSignature(rawBody, sigHeader, secret) {
   if (!sigHeader || !secret) return false;
   const parts = sigHeader.split(',').map((p) => p.trim());
@@ -341,6 +354,15 @@ const server = createServer(async (req, res) => {
       const key = decodeURIComponent(pathname.slice('/api/license/'.length)).trim().toUpperCase();
       if (!/^VC-(?:(?:PRO|TEAM)-)?[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key)) {
         return sendJson(res, 400, { valid: false, error: 'Malformed license key' });
+      }
+      if (matchFounderKey(key)) {
+        return sendJson(res, 200, {
+          valid: true,
+          key,
+          tier: 'pro_lifetime',
+          unlocked_all: true,
+          founder: true,
+        });
       }
       const db = loadLicenseDb();
       const rec = db.licenses[key];
