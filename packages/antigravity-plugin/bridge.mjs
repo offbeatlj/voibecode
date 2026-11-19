@@ -9,6 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SIDECAR_DIR = join(__dirname, 'sidecars', 'voibecode');
 const STATE_PATH = join(homedir(), '.gemini', 'voibecode-state.json');
 const ALERTS_PATH = join(homedir(), '.gemini', 'voibecode-alerts.json');
+const LICENSE_PATH = join(homedir(), '.gemini', 'voibecode-license.json');
 const VOICE_CACHE_DIR = join(homedir(), '.gemini', 'voibecode-voice-cache');
 
 const PORT = Number(process.env.VOIBECODE_PORT || 4731);
@@ -379,6 +380,23 @@ const server = createServer(async (req, res) => {
 
     if (method === 'GET' && pathname === '/api/alerts') {
       return sendJson(res, 200, loadAlertsConfig());
+    }
+
+    if (method === 'GET' && pathname === '/api/license/local') {
+      try {
+        const parsed = JSON.parse(readFileSync(LICENSE_PATH, 'utf-8'));
+        if (parsed?.active) {
+          return sendJson(res, 200, {
+            active: true,
+            tier: parsed.tier || 'pro_lifetime',
+            founder: Boolean(parsed.founder),
+            key: typeof parsed.key === 'string' ? parsed.key : undefined,
+          });
+        }
+      } catch {
+        // No local license saved
+      }
+      return sendJson(res, 200, { active: false });
     }
 
     if (method === 'POST' && pathname === '/api/alerts') {

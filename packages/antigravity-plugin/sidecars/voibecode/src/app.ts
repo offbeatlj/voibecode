@@ -14,6 +14,13 @@ interface SidecarState extends VoibeTelemetryStats {
   workspaces?: WorkspaceAgentStatus[];
 }
 
+interface SidecarLicenseStatus {
+  active: boolean;
+  tier?: string;
+  founder?: boolean;
+  maskedKey?: string;
+}
+
 function formatClock(ms: number): string {
   const sec = Math.max(0, Math.floor(ms / 1000));
   const m = Math.floor(sec / 60);
@@ -46,6 +53,8 @@ function esc(s: string): string {
 class VoibeSidecarRadar {
   private readonly skyCanvas = document.getElementById('sky-canvas') as HTMLCanvasElement;
   private readonly brandDot = document.getElementById('brand-dot') as HTMLSpanElement;
+  private readonly tierBadge = document.getElementById('tier-badge') as HTMLSpanElement;
+  private readonly upgradeTopBtn = document.getElementById('upgrade-top-btn') as HTMLButtonElement;
   private readonly simStallBtn = document.getElementById('sim-stall-btn') as HTMLButtonElement;
   private readonly heroChip = document.getElementById('hero-chip') as HTMLSpanElement;
   private readonly heroTitle = document.getElementById('hero-title') as HTMLHeadingElement;
@@ -72,6 +81,13 @@ class VoibeSidecarRadar {
   private readonly mStalls = document.getElementById('m-stalls') as HTMLSpanElement;
   private readonly mGreen = document.getElementById('m-green') as HTMLSpanElement;
   private readonly streakText = document.getElementById('streak-text') as HTMLSpanElement;
+
+  private readonly proCard = document.getElementById('pro-card') as HTMLElement;
+  private readonly toggleKeyBtn = document.getElementById('toggle-key-btn') as HTMLButtonElement;
+  private readonly keyDrawer = document.getElementById('key-drawer') as HTMLDivElement;
+  private readonly licenseInput = document.getElementById('license-input') as HTMLInputElement;
+  private readonly activateKeyBtn = document.getElementById('activate-key-btn') as HTMLButtonElement;
+  private readonly licenseStatus = document.getElementById('license-status') as HTMLSpanElement;
 
   private readonly shader: TwilightShaderController;
   private readonly audio: TwilightAudioEngine;
@@ -102,9 +118,64 @@ class VoibeSidecarRadar {
     });
 
     this.bindEvents();
+    void this.loadLicense();
     void this.loadAlerts();
     void this.poll();
     window.setInterval(() => void this.poll(), 1000);
+  }
+
+  private async loadLicense(): Promise<void> {
+    try {
+      const res = await fetch('api/license');
+      if (!res.ok) return;
+      const lic = (await res.json()) as SidecarLicenseStatus;
+      this.applyLicenseUI(lic);
+    } catch {
+      // Ignore offline
+    }
+  }
+
+  private applyLicenseUI(lic: SidecarLicenseStatus): void {
+    const active = Boolean(lic.active);
+    this.tierBadge.hidden = !active;
+    this.tierBadge.textContent = lic.founder ? 'FOUNDER' : 'PRO';
+    this.upgradeTopBtn.hidden = active;
+    this.proCard.hidden = active;
+  }
+
+  private async activateKey(): Promise<void> {
+    const key = this.licenseInput.value.trim().toUpperCase();
+    if (!key) return;
+    this.activateKeyBtn.disabled = true;
+    this.licenseStatus.className = 'mono-muted';
+    this.licenseStatus.textContent = 'Verifying…';
+    try {
+      const res = await fetch('api/license/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key }),
+      });
+      const out = (await res.json()) as {
+        ok: boolean;
+        active?: boolean;
+        tier?: string;
+        founder?: boolean;
+        error?: string;
+      };
+      if (out.ok && out.active) {
+        this.licenseStatus.className = 'mono-muted status-ok';
+        this.licenseStatus.textContent = out.founder ? 'Founder unlocked ✓' : 'Pro unlocked ✓';
+        this.applyLicenseUI({ active: true, tier: out.tier, founder: out.founder });
+      } else {
+        this.licenseStatus.className = 'mono-muted status-err';
+        this.licenseStatus.textContent = out.error || 'Invalid key';
+      }
+    } catch {
+      this.licenseStatus.className = 'mono-muted status-err';
+      this.licenseStatus.textContent = 'Offline';
+    } finally {
+      this.activateKeyBtn.disabled = false;
+    }
   }
 
   private async loadAlerts(): Promise<void> {
@@ -299,6 +370,25 @@ class VoibeSidecarRadar {
   }
 
   private bindEvents(): void {
+    this.upgradeTopBtn.addEventListener('click', () => {
+      this.proCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      this.keyDrawer.hidden = false;
+      this.licenseInput.focus();
+    });
+
+    this.toggleKeyBtn.addEventListener('click', () => {
+      this.keyDrawer.hidden = !this.keyDrawer.hidden;
+      if (!this.keyDrawer.hidden) this.licenseInput.focus();
+    });
+
+    this.activateKeyBtn.addEventListener('click', () => void this.activateKey());
+    this.licenseInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        void this.activateKey();
+      }
+    });
+
     this.simStallBtn.addEventListener('click', () => {
       this.simUntil = Date.now() + 4200;
       if (this.voiceEnabled) {

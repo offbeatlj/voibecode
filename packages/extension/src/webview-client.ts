@@ -4,6 +4,7 @@ import {
   FLAGSHIP_HEX,
   LicenseClientState,
   MatrixCell,
+  PRO_LIFETIME_CHECKOUT_URL,
   QuoteChannel,
   SwatchEntry,
   TwilightAudioEngine,
@@ -44,6 +45,8 @@ const topStatusEl = document.getElementById('top-status') as HTMLElement;
 const btnSwatches = document.getElementById('btn-swatches') as HTMLButtonElement;
 const btnChannel = document.getElementById('btn-channel') as HTMLButtonElement;
 const btnAudio = document.getElementById('btn-audio') as HTMLButtonElement;
+const btnUpgrade = document.getElementById('btn-upgrade') as HTMLButtonElement;
+const btnLicense = document.getElementById('btn-license') as HTMLButtonElement;
 const quoteBand = document.getElementById('quote-band') as HTMLElement;
 const quoteTextEl = document.getElementById('quote-text') as HTMLElement;
 const quoteAuthorEl = document.getElementById('quote-author') as HTMLElement;
@@ -113,6 +116,22 @@ function renderStatusHeader(): void {
     topStatusEl.textContent = `VOIBECODE // ${ws} // IDLE SKY`;
   } else {
     topStatusEl.textContent = `VOIBECODE // ${ws} // WAIT-STATE`;
+  }
+}
+
+function renderLicenseControls(): void {
+  if (license.founder) {
+    btnUpgrade.hidden = true;
+    btnLicense.textContent = '[ FOUNDER ]';
+    btnLicense.classList.add('is-active');
+  } else if (license.fullDropper) {
+    btnUpgrade.hidden = true;
+    btnLicense.textContent = '[ PRO ]';
+    btnLicense.classList.add('is-active');
+  } else {
+    btnUpgrade.hidden = false;
+    btnLicense.textContent = '[ ENTER KEY ]';
+    btnLicense.classList.remove('is-active');
   }
 }
 
@@ -304,6 +323,12 @@ function dismissImmediately(trigger: string): void {
 btnSwatches.addEventListener('click', toggleSwatches);
 btnChannel.addEventListener('click', cycleChannel);
 btnAudio.addEventListener('click', () => void toggleAudio());
+btnUpgrade.addEventListener('click', () => {
+  vscode.postMessage({ type: 'OPEN_URL', url: PRO_LIFETIME_CHECKOUT_URL });
+});
+btnLicense.addEventListener('click', () => {
+  vscode.postMessage({ type: 'PROMPT_LICENSE' });
+});
 
 swatchesGrid.addEventListener('mouseleave', () => {
   if (previewHex !== currentHex) {
@@ -402,6 +427,7 @@ window.addEventListener('message', (event: MessageEvent<ExtensionToWebviewMessag
     renderBottomAttribution(previewHex);
   } else if (msg.type === 'LICENSE') {
     license = msg.license;
+    renderLicenseControls();
     renderChannelControlsAndQuote();
     renderBottomAttribution(previewHex);
     if (swatchesOpen) renderSwatches();
@@ -414,6 +440,7 @@ window.addEventListener('message', (event: MessageEvent<ExtensionToWebviewMessag
 });
 
 renderStatusHeader();
+renderLicenseControls();
 renderChannelControlsAndQuote();
 renderBottomAttribution(currentHex);
 vscode.postMessage({ type: 'READY' });

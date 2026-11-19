@@ -38,8 +38,16 @@
   "contributes": {
     "commands": [
       {
+        "command": "voibecode.openMenu",
+        "title": "VoibeCode: Open Menu & License"
+      },
+      {
         "command": "voibecode.openWaitState",
         "title": "VoibeCode: Open Wait-State Sky"
+      },
+      {
+        "command": "voibecode.upgradePro",
+        "title": "VoibeCode: Upgrade to Pro ($39 Lifetime)"
       },
       {
         "command": "voibecode.enterLicenseKey",

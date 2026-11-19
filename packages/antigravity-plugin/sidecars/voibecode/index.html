@@ -14,8 +14,12 @@
         <div class="brand-wrap">
           <span id="brand-dot" class="status-dot is-idle"></span>
           <span class="brand-name">VoibeCode</span>
+          <span id="tier-badge" class="badge-pro" hidden>PRO</span>
         </div>
-        <button id="sim-stall-btn" class="btn-ghost" type="button">Test stall</button>
+        <div class="topbar-actions">
+          <button id="upgrade-top-btn" class="btn-primary-xs" type="button">Upgrade</button>
+          <button id="sim-stall-btn" class="btn-ghost" type="button">Test stall</button>
+        </div>
       </header>
 
       <!-- Live Status -->
@@ -100,6 +104,40 @@
             <span class="metric-label">Green</span>
             <span id="m-green" class="metric-value is-green">100%</span>
           </div>
+        </div>
+      </section>
+
+      <!-- Upgrade / License Activation Card (auto-hides once Pro/Founder is active) -->
+      <section id="pro-card" class="card">
+        <div class="card-head">
+          <span class="card-title">VoibeCode Pro</span>
+          <span class="mono-muted">$39 once</span>
+        </div>
+        <p class="card-desc">Unlimited phone/Slack alerts, all 4 soundscapes &amp; lifetime updates.</p>
+        <div class="pro-actions">
+          <a
+            href="https://buy.stripe.com/eVq00jcua9Gd11g46w4Ja00"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-primary-sm"
+          >
+            Upgrade · $39 ↗
+          </a>
+          <button id="toggle-key-btn" class="btn-secondary" type="button">Have a key?</button>
+        </div>
+        <div id="key-drawer" class="key-drawer" hidden>
+          <div class="input-row">
+            <input
+              id="license-input"
+              class="text-input mono"
+              type="text"
+              placeholder="VC-XXXX-XXXX"
+              spellcheck="false"
+              autocomplete="off"
+            />
+            <button id="activate-key-btn" class="btn-secondary" type="button">Activate</button>
+          </div>
+          <span id="license-status" class="mono-muted"></span>
         </div>
       </section>
 

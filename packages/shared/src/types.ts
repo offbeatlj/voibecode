@@ -231,6 +231,7 @@ export interface LicenseRecord {
   tier: PurchaseTier;
   swatch_hex?: string;
   unlocked_all: boolean;
+  founder?: boolean;
   fourthwall_promo?: string;
   created_at?: string;
 }
@@ -249,6 +250,7 @@ export interface LicenseClientState {
   tier?: PurchaseTier;
   unlockedHexes: string[];
   fullDropper: boolean;
+  founder?: boolean;
   fourthwallPromo?: string;
 }
 
@@ -290,6 +292,7 @@ export type WebviewToExtensionMessage =
 
 export const FLAGSHIP_HEX = '#FF7B6B';
 export const VOIBECODE_ORIGIN = 'https://voibecode.com';
+export const PRO_LIFETIME_CHECKOUT_URL = 'https://buy.stripe.com/eVq00jcua9Gd11g46w4Ja00';
 export const FOURTHWALL_STORE_URL = 'https://voibecode-shop.fourthwall.com/';
 
 export const VOIBE_CARTRIDGES: VoibeCartridgeSpec[] = [

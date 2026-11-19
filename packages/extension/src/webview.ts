@@ -109,6 +109,7 @@ export function getWebviewHtml(
       color: var(--fg);
       outline: none;
     }
+    .hl-btn[hidden] { display: none; }
     .center {
       flex: 1;
       display: flex;
@@ -197,6 +198,8 @@ export function getWebviewHtml(
         <button id="btn-swatches" class="hl-btn" type="button">[ S: SWATCHES ]</button>
         <button id="btn-channel" class="hl-btn" type="button">[ C: CHANNEL ]</button>
         <button id="btn-audio" class="hl-btn" type="button">[ M: AUDIO OFF ]</button>
+        <button id="btn-upgrade" class="hl-btn is-active" type="button">[ UPGRADE PRO ]</button>
+        <button id="btn-license" class="hl-btn" type="button">[ ENTER KEY ]</button>
       </div>
     </header>
 

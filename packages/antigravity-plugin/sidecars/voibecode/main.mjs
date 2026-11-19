@@ -8,6 +8,7 @@ import { Response, SidecarApp } from 'sidecar_sdk';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const STATE_PATH = join(homedir(), '.gemini', 'voibecode-state.json');
 const ALERTS_PATH = join(homedir(), '.gemini', 'voibecode-alerts.json');
+const LICENSE_PATH = join(homedir(), '.gemini', 'voibecode-license.json');
 const VOICE_CACHE_DIR = join(homedir(), '.gemini', 'voibecode-voice-cache');
 
 const STATIC_FILES = {
@@ -65,6 +66,40 @@ function saveAlertsConfig(cfg) {
     const tmp = `${ALERTS_PATH}.sidecar.tmp`;
     writeFileSync(tmp, JSON.stringify(cfg, null, 2), 'utf-8');
     renameSync(tmp, ALERTS_PATH);
+  } catch {
+    // Ignore write failure
+  }
+}
+
+function maskLicenseKey(key) {
+  const s = String(key || '').trim().toUpperCase();
+  if (s.length < 8) return '';
+  return `${s.slice(0, 3)}****-${s.slice(-4)}`;
+}
+
+function loadLocalLicense() {
+  try {
+    const parsed = JSON.parse(readFileSync(LICENSE_PATH, 'utf-8'));
+    if (parsed && parsed.active) {
+      return {
+        active: true,
+        tier: String(parsed.tier || 'pro_lifetime'),
+        founder: Boolean(parsed.founder),
+        maskedKey: maskLicenseKey(parsed.key),
+      };
+    }
+  } catch {
+    // Absent or invalid license file
+  }
+  return { active: false, tier: 'free', founder: false, maskedKey: '' };
+}
+
+function saveLocalLicense(rec) {
+  try {
+    mkdirSync(dirname(LICENSE_PATH), { recursive: true });
+    const tmp = `${LICENSE_PATH}.sidecar.tmp`;
+    writeFileSync(tmp, JSON.stringify(rec, null, 2), 'utf-8');
+    renameSync(tmp, LICENSE_PATH);
   } catch {
     // Ignore write failure
   }
@@ -170,6 +205,38 @@ for (const [route, [file, contentType]] of Object.entries(STATIC_FILES)) {
 }
 
 app.api('/api/alerts', () => loadAlertsConfig(), 'GET');
+
+app.api('/api/license', () => loadLocalLicense(), 'GET');
+
+app.api(
+  '/api/license/activate',
+  async (body) => {
+    const key = String(body?.key || '').trim().toUpperCase();
+    if (!/^VC-(?:(?:PRO|TEAM)-)?[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key)) {
+      return { ok: false, error: 'Enter a valid VC-XXXX-XXXX key.' };
+    }
+    try {
+      const res = await fetch(`https://voibecode.com/api/license/${encodeURIComponent(key)}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.valid) {
+        return { ok: false, error: data?.error || 'License key not found.' };
+      }
+      const rec = {
+        active: true,
+        key,
+        tier: String(data.tier || 'pro_lifetime'),
+        founder: Boolean(data.founder),
+        unlockedAll: Boolean(data.unlocked_all ?? true),
+        verifiedAt: new Date().toISOString(),
+      };
+      saveLocalLicense(rec);
+      return { ok: true, active: true, tier: rec.tier, founder: rec.founder };
+    } catch {
+      return { ok: false, error: 'Could not reach voibecode.com to verify key.' };
+    }
+  },
+  'POST'
+);
 
 app.api(
   '/api/alerts',

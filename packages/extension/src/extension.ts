@@ -1,5 +1,6 @@
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import {
@@ -9,6 +10,8 @@ import {
   FLAGSHIP_HEX,
   LicenseClientState,
   LicenseRecord,
+  PRO_LIFETIME_CHECKOUT_URL,
+  PurchaseTier,
   QuoteChannel,
   VOIBECODE_ORIGIN,
   VoibeManifest,
@@ -24,6 +27,16 @@ const STATE_MANIFEST_CACHE = 'voibecode.manifestCache';
 const STATE_LICENSE_CACHE = 'voibecode.licenseCache';
 const STATE_SELECTED_SWATCH = 'voibecode.selectedSwatch';
 const STATE_CHANNEL = 'voibecode.channel';
+const SHARED_LICENSE_PATH = path.join(os.homedir(), '.gemini', 'voibecode-license.json');
+
+interface SharedLicenseRecord {
+  active?: boolean;
+  key?: string;
+  tier?: string;
+  founder?: boolean;
+  unlockedAll?: boolean;
+  verifiedAt?: string;
+}
 
 interface ActiveExecutionTracker {
   id: number;
@@ -39,6 +52,7 @@ class VoibeCodeController implements vscode.Disposable {
   private readonly disposables: vscode.Disposable[] = [];
 
   private panel: vscode.WebviewPanel | null = null;
+  private readonly statusBarItem: vscode.StatusBarItem;
   private state: WatcherState = 'IDLE';
   private lastExitCode: number | undefined;
   private audioMode: AudioMode = 'OFF';
@@ -53,6 +67,11 @@ class VoibeCodeController implements vscode.Disposable {
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
+    this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    this.statusBarItem.command = 'voibecode.openMenu';
+    this.disposables.push(this.statusBarItem);
+    this.updateStatusBar();
+    this.statusBarItem.show();
     this.registerHooks();
     this.resetIdleTimer();
     void this.refreshManifestInBackground();
@@ -74,25 +93,68 @@ class VoibeCodeController implements vscode.Disposable {
     this.postMessage({ type: 'STATE_CHANGE', state: 'RUNNING' });
   }
 
+  public upgradeToPro(): void {
+    void vscode.env.openExternal(vscode.Uri.parse(PRO_LIFETIME_CHECKOUT_URL));
+  }
+
+  public async openQuickMenu(): Promise<void> {
+    const lic = this.getCachedLicense();
+    const cfg = this.getConfig();
+    const items: Array<vscode.QuickPickItem & { action: string }> = [
+      { label: 'Open Wait-State Sky', description: 'Preview twilight shader & audio engine', action: 'open' },
+      ...(!lic.fullDropper
+        ? [
+            {
+              label: 'Upgrade to Pro ($39 Lifetime)',
+              description: 'Unlock all 256 skies, quotes & Away Alerts',
+              action: 'upgrade',
+            },
+          ]
+        : []),
+      {
+        label: 'Enter License Key (VC-...)',
+        description: lic.founder ? 'Active: Founder' : lic.fullDropper ? 'Active: Pro' : 'Activate your VC- key',
+        action: 'license',
+      },
+      { label: 'Open VoibeCode Web Radar (voibecode.com)', description: 'Multi-workspace radar & Away Alerts', action: 'web' },
+      {
+        label: 'Toggle Stall Watcher On/Off',
+        description: cfg.enabled ? 'Currently Enabled' : 'Currently Paused',
+        action: 'toggle',
+      },
+    ];
+
+    const picked = await vscode.window.showQuickPick(items, {
+      title: lic.founder ? 'VoibeCode (Founder)' : lic.fullDropper ? 'VoibeCode (Pro)' : 'VoibeCode (Free)',
+      placeHolder: 'Choose a VoibeCode action',
+    });
+    if (!picked) return;
+    if (picked.action === 'open') this.openManually();
+    else if (picked.action === 'upgrade') this.upgradeToPro();
+    else if (picked.action === 'license') await this.promptForLicenseKey();
+    else if (picked.action === 'web') void vscode.env.openExternal(vscode.Uri.parse(VOIBECODE_ORIGIN));
+    else if (picked.action === 'toggle') await this.toggleEnabledSetting();
+  }
+
   public async promptForLicenseKey(): Promise<void> {
     const raw = await vscode.window.showInputBox({
       title: 'VoibeCode License Key',
-      prompt: 'Enter your VC-XXXX-XXXX license key to unlock swatches and quote archives.',
+      prompt: 'Enter your VC-XXXX-XXXX or VC-PRO-XXXX-XXXX license key to unlock swatches and quote archives.',
       placeHolder: 'VC-XXXX-XXXX',
       ignoreFocusOut: true,
     });
 
     if (!raw) return;
     const clean = raw.trim().toUpperCase();
-    if (!/^VC-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(clean)) {
+    if (!/^VC-(?:(?:PRO|TEAM)-)?[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(clean)) {
       void vscode.window.showErrorMessage(
-        'VoibeCode: Expected license key format VC-XXXX-XXXX.'
+        'VoibeCode: Expected license key format VC-XXXX-XXXX or VC-PRO-XXXX-XXXX.'
       );
       return;
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
+    const timeout = setTimeout(() => controller.abort(), 4000);
     try {
       const res = await fetch(
         `${VOIBECODE_ORIGIN}/api/license/${encodeURIComponent(clean)}`,
@@ -119,10 +181,21 @@ class VoibeCodeController implements vscode.Disposable {
         tier: data.tier,
         unlockedHexes: Array.from(unlockedSet),
         fullDropper: prev.fullDropper || data.unlocked_all,
+        founder: Boolean(data.founder || prev.founder),
         fourthwallPromo: data.fourthwall_promo ?? prev.fourthwallPromo,
       };
 
       await this.context.globalState.update(STATE_LICENSE_CACHE, nextLicense);
+      if (data.unlocked_all) {
+        this.writeSharedLicenseFile({
+          active: true,
+          key: clean,
+          tier: data.tier,
+          founder: Boolean(data.founder),
+          unlockedAll: true,
+          verifiedAt: new Date().toISOString(),
+        });
+      }
       if (data.swatch_hex) {
         await this.context.globalState.update(
           STATE_SELECTED_SWATCH,
@@ -130,6 +203,7 @@ class VoibeCodeController implements vscode.Disposable {
         );
       }
 
+      this.updateStatusBar();
       this.postMessage({ type: 'LICENSE', license: nextLicense });
       if (data.swatch_hex) {
         this.postMessage({
@@ -138,12 +212,13 @@ class VoibeCodeController implements vscode.Disposable {
         });
       }
 
+      const label = nextLicense.founder ? 'FOUNDER' : data.tier.toUpperCase();
       void vscode.window.showInformationMessage(
-        `VoibeCode: Activated ${data.tier.toUpperCase()} entitlement (${clean}).`
+        `VoibeCode: Activated ${label} entitlement (${clean}).`
       );
     } catch {
       void vscode.window.showWarningMessage(
-        'VoibeCode: Unable to reach voibecode.com within 2s to verify key.'
+        'VoibeCode: Unable to reach voibecode.com within 4s to verify key.'
       );
     } finally {
       clearTimeout(timeout);
@@ -157,6 +232,7 @@ class VoibeCodeController implements vscode.Disposable {
     if (!next) {
       this.dismissImmediate();
     }
+    this.updateStatusBar();
     void vscode.window.setStatusBarMessage(
       `VoibeCode ${next ? 'enabled' : 'paused'}`,
       2500
@@ -183,15 +259,58 @@ class VoibeCodeController implements vscode.Disposable {
     return createDefaultManifest();
   }
 
+  private readSharedLicenseFile(): SharedLicenseRecord | null {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(SHARED_LICENSE_PATH, 'utf8')) as SharedLicenseRecord;
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private writeSharedLicenseFile(rec: SharedLicenseRecord): void {
+    try {
+      fs.mkdirSync(path.dirname(SHARED_LICENSE_PATH), { recursive: true });
+      const tmp = `${SHARED_LICENSE_PATH}.ext.tmp`;
+      fs.writeFileSync(tmp, JSON.stringify(rec, null, 2), 'utf8');
+      fs.renameSync(tmp, SHARED_LICENSE_PATH);
+    } catch {
+      // Ignore write failures
+    }
+  }
+
+  private updateStatusBar(): void {
+    const lic = this.getCachedLicense();
+    if (lic.founder) {
+      this.statusBarItem.text = '$(pulse) VoibeCode · Founder';
+      this.statusBarItem.tooltip = 'VoibeCode Founder Edition active — click for menu & radar';
+    } else if (lic.fullDropper) {
+      this.statusBarItem.text = '$(pulse) VoibeCode · Pro';
+      this.statusBarItem.tooltip = 'VoibeCode Pro active — click for menu & radar';
+    } else {
+      this.statusBarItem.text = '$(pulse) VoibeCode';
+      this.statusBarItem.tooltip = 'VoibeCode Free — click to open menu, enter key, or upgrade';
+    }
+  }
+
   private getCachedLicense(): LicenseClientState {
     const cached =
       this.context.globalState.get<LicenseClientState>(STATE_LICENSE_CACHE);
-    return (
-      cached ?? {
-        unlockedHexes: [],
-        fullDropper: false,
-      }
-    );
+    const base: LicenseClientState = cached ?? {
+      unlockedHexes: [],
+      fullDropper: false,
+    };
+    const shared = this.readSharedLicenseFile();
+    if (shared?.active && shared.unlockedAll) {
+      return {
+        ...base,
+        licenseKey: shared.key ?? base.licenseKey,
+        tier: (shared.tier as PurchaseTier) ?? base.tier ?? 'pro_lifetime',
+        fullDropper: true,
+        founder: Boolean(shared.founder || base.founder),
+      };
+    }
+    return base;
   }
 
   private resolveOpeningSwatchHex(): string {
@@ -670,8 +789,14 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(controller);
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('voibecode.openMenu', () => {
+      void controller.openQuickMenu();
+    }),
     vscode.commands.registerCommand('voibecode.openWaitState', () => {
       controller.openManually();
+    }),
+    vscode.commands.registerCommand('voibecode.upgradePro', () => {
+      controller.upgradeToPro();
     }),
     vscode.commands.registerCommand('voibecode.enterLicenseKey', () => {
       void controller.promptForLicenseKey();
